@@ -18,7 +18,7 @@ _Only tested with local LXD_
 
 ## Use case
 
-You can have a multi-node MicroK8s on your local machine using LXD (system container).
+You can have a multi-node MicroK8s on your workstation or laptop using LXD (system container).
 
 ## Pre-requisite
 
@@ -108,16 +108,19 @@ module.microk8s.lxd_container.microk8s-nodes[0]: Creating...
 While it is provisioning, you can see the lxc containers.
 
 ```
-$ lxc list
-+--------------------+---------+-----------------------+------+-----------+-----------+
-|        NAME        |  STATE  |         IPV4          | IPV6 |   TYPE    | SNAPSHOTS |
-+--------------------+---------+-----------------------+------+-----------+-----------+
-| mk8s-node-nemo-0   | RUNNING | 10.124.129.57 (eth0)  |      | CONTAINER | 0         |
-+--------------------+---------+-----------------------+------+-----------+-----------+
-| mk8s-node-nemo-1   | RUNNING | 10.124.129.249 (eth0) |      | CONTAINER | 0         |
-+--------------------+---------+-----------------------+------+-----------+-----------+
-| mk8s-node-nemo-2   | RUNNING | 10.124.129.168 (eth0) |      | CONTAINER | 0         |
-+--------------------+---------+-----------------------+------+-----------+-----------+
+root@test:~# lxc list
++------------------+---------+----------------------------+------+-----------+-----------+
+|       NAME       |  STATE  |            IPV4            | IPV6 |   TYPE    | SNAPSHOTS |
++------------------+---------+----------------------------+------+-----------+-----------+
+| mk8s-node-nemo-0 | RUNNING | 10.60.198.198 (eth0)       |      | CONTAINER | 0         |
+|                  |         | 10.1.32.64 (vxlan.calico)  |      |           |           |
++------------------+---------+----------------------------+------+-----------+-----------+
+| mk8s-node-nemo-1 | RUNNING | 10.60.198.234 (eth0)       |      | CONTAINER | 0         |
+|                  |         | 10.1.53.192 (vxlan.calico) |      |           |           |
++------------------+---------+----------------------------+------+-----------+-----------+
+| mk8s-node-nemo-2 | RUNNING | 10.60.198.250 (eth0)       |      | CONTAINER | 0         |
+|                  |         | 10.1.227.64 (vxlan.calico) |      |           |           |
++------------------+---------+----------------------------+------+-----------+-----------+
 
 ```
 
@@ -133,3 +136,52 @@ root@mk8s-node-nemo-0:~#
 
 Kubernetes configuration is automatically placed into `/tmp/client.config`.  You can simply do `export KUBECONFIG=/tmp/client.config` to manage the cluster without going inside LXD container.
 
+Checking with your local `kubectl`
+
+```
+kubectl get no -o wide
+NAME               STATUS   ROLES    AGE     VERSION                     INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+mk8s-node-nemo-0   Ready    <none>   5m30s   v1.20.1-34+f62aca050e0b52   10.60.198.198   <none>        Ubuntu 20.04.1 LTS   5.4.0-51-generic   containerd://1.3.7
+mk8s-node-nemo-2   Ready    <none>   115s    v1.20.1-34+f62aca050e0b52   10.60.198.250   <none>        Ubuntu 20.04.1 LTS   5.4.0-51-generic   containerd://1.3.7
+mk8s-node-nemo-1   Ready    <none>   106s    v1.20.1-34+f62aca050e0b52   10.60.198.234   <none>        Ubuntu 20.04.1 LTS   5.4.0-51-generic   containerd://1.3.7
+```
+
+## Enabling addons
+
+if you need to enable some addons, you need to choose one of the lxd container, for example `mk8s-node-nemo-0`.
+Example below enables the `dns` addon.
+
+
+```
+root@test:~# lxc exec mk8s-node-nemo-0 -- microk8s enable dns
+Enabling DNS
+Applying manifest
+serviceaccount/coredns created
+configmap/coredns created
+deployment.apps/coredns created
+service/kube-dns created
+clusterrole.rbac.authorization.k8s.io/coredns created
+clusterrolebinding.rbac.authorization.k8s.io/coredns created
+Restarting kubelet
+Adding argument --cluster-domain to nodes.
+Configuring node 10.60.198.198
+Configuring node 10.60.198.234
+Configuring node 10.60.198.250
+Adding argument --cluster-dns to nodes.
+Configuring node 10.60.198.198
+Configuring node 10.60.198.234
+Configuring node 10.60.198.250
+Restarting nodes.
+Configuring node 10.60.198.198
+Configuring node 10.60.198.234
+Configuring node 10.60.198.250
+DNS is enabled
+root@test:~# kubectl get pods -A -o wide
+NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE     IP              NODE               NOMINATED NODE   READINESS GATES
+kube-system   calico-kube-controllers-847c8c99d-djz49   1/1     Running   0          10m     10.1.32.66      mk8s-node-nemo-0   <none>           <none>
+kube-system   calico-node-frgzx                         1/1     Running   1          6m25s   10.60.198.250   mk8s-node-nemo-2   <none>           <none>
+kube-system   coredns-86f78bb79c-ljlhp                  1/1     Running   0          97s     10.1.53.193     mk8s-node-nemo-1   <none>           <none>
+kube-system   calico-node-mc87j                         1/1     Running   1          7m35s   10.60.198.198   mk8s-node-nemo-0   <none>           <none>
+kube-system   calico-node-d62qq                         1/1     Running   1          6m25s   10.60.198.234   mk8s-node-nemo-1   <none>           <none>
+
+``
