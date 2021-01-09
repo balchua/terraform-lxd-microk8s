@@ -52,7 +52,7 @@ module "microk8s" {
 
 Parameter descriptions:
 
-* `source` - Where the terraform module is located.  Example values: `../` or `"git::https://github.com/balchua/terraform-lxd-microk8s?ref=v0.1.0"`
+* `source` - Where the terraform module is located.  Example values: `../` or `"git::https://github.com/balchua/terraform-lxd-microk8s?ref=master"`
 * `node_count` - Specify how many lxd containers. Default: `3`
 * `microk8s_channel` - Specify the MicroK8s channel you want to use. Default `1.20/stable`
 * `cluster_token` - The token to use to join several nodes together, forming a cluster.  No default
