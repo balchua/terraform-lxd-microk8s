@@ -1,9 +1,3 @@
-variable "cluster_token" {
-  type        = string
-  default     = "PoiuyTrewQasdfghjklMnbvcxz123409"
-  description = "The cluster token to use to join a node.  Must be 32 alphanumeric long." 
-}
-
 variable "cluster_token_ttl_seconds" {
   type        = number
   default     = 3600

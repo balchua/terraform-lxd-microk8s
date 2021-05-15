@@ -1,3 +1,7 @@
+resource "random_id" "cluster_token" {
+  byte_length = 16
+}
+
 resource "lxd_container" "microk8s-nodes" {
   name        = "mk8s-node-${var.cluster_name}-${count.index}" 
   count       = var.node_count
@@ -48,7 +52,7 @@ data "template_file" "add_node" {
   template = file("${path.module}/templates/add-node.sh")
   vars = {
     cluster_token_ttl_seconds = var.cluster_token_ttl_seconds
-    cluster_token = var.cluster_token
+    cluster_token = random_id.cluster_token.hex
   }
 }
 
@@ -65,6 +69,6 @@ data "template_file" "join_token" {
   template = file("${path.module}/templates/join.sh")
   vars = {
     controller_name = "mk8s-node-${var.cluster_name}-0"
-    cluster_token = var.cluster_token
+    cluster_token = random_id.cluster_token.hex
   }
 }
