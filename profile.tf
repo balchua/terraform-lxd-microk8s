@@ -43,14 +43,6 @@ resource "lxd_profile" "microk8s-profile" {
       source: "/sys/module/nf_conntrack/parameters/hashsize"
     }
   }
-  # device {
-  #   type = "disk"
-  #   name = "aadisable1"
-  #   properties = {
-  #     path: "/sys/module/apparmor/parameters/enabled"
-  #     source: "/dev/null"
-  #   }
-  # }
 
   device {
     type = "disk"
