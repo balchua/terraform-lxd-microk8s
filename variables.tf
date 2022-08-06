@@ -18,7 +18,7 @@ variable "cluster_name" {
 
 variable "microk8s_channel" {
   type        = string
-  default     = "1.20/stable"
+  default     = "1.24/stable"
   description = "The MicroK8s channel to use"
 }
 

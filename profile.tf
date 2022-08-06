@@ -43,14 +43,14 @@ resource "lxd_profile" "microk8s-profile" {
       source: "/sys/module/nf_conntrack/parameters/hashsize"
     }
   }
-  device {
-    type = "disk"
-    name = "aadisable1"
-    properties = {
-      path: "/sys/module/apparmor/parameters/enabled"
-      source: "/dev/null"
-    }
-  }
+  # device {
+  #   type = "disk"
+  #   name = "aadisable1"
+  #   properties = {
+  #     path: "/sys/module/apparmor/parameters/enabled"
+  #     source: "/dev/null"
+  #   }
+  # }
 
   device {
     type = "disk"
@@ -70,4 +70,12 @@ resource "lxd_profile" "microk8s-profile" {
     }
   } 
 
+  device {
+    type = "disk"
+    name = "aadisable4"
+    properties = {
+      path: "/proc/sys/net/netfilter/nf_conntrack_max"
+      source: "/proc/sys/net/netfilter/nf_conntrack_max"
+    }
+  } 
 }

@@ -23,7 +23,7 @@ You can have a multi-node MicroK8s on your workstation or laptop using LXD (syst
 ## Pre-requisite
 
 * LXD installed locally
-* terraform v0.14.0
+* terraform v1.2.6
 * disabled ipv6 on lxd bridge
 
 ### Disable lxd IPv6
@@ -43,7 +43,7 @@ _Currently the joining of nodes with IPv6 doesnt work._
 module "microk8s" {
   source                     = "../"
   node_count                 = "3"
-  microk8s_channel           = "1.20/edge"
+  microk8s_channel           = "1.24/edge"
   cluster_token              = "PoiuyTrewQasdfghjklMnbvcxz123409"
   cluster_token_ttl_seconds  = 3600
   cluster_name               = "nemo"
@@ -134,7 +134,9 @@ root@mk8s-node-nemo-0:~#
 
 ## Kubernetes configuration
 
-Kubernetes configuration is automatically placed into `/tmp/client.config`.  You can simply do `export KUBECONFIG=/tmp/client.config` to manage the cluster without going inside LXD container.
+Kubernetes configuration is automatically placed into `/tmp/client.config`. **Please copy it to a safer location**
+
+You can simply do `export KUBECONFIG=/tmp/client.config` to manage the cluster without going inside LXD container.
 
 Checking with your local `kubectl`
 
